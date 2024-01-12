@@ -71,15 +71,17 @@ defineExpose({
 })
 
 onMounted(() => {
-  editor = monaco.editor.create(editorElement.value!, defu(props.options, defaultOptions))
-  editorRef.value = editor
-  model = monaco.editor.createModel(props.modelValue, lang.value)
-  editor.setModel(model)
-  editor.onDidChangeModelContent(() => {
-    emit('update:modelValue', editor.getValue())
+  nextTick(() => {
+    editor = monaco.editor.create(editorElement.value!, defu(props.options, defaultOptions))
+    editorRef.value = editor
+    model = monaco.editor.createModel(props.modelValue, lang.value)
+    editor.setModel(model)
+    editor.onDidChangeModelContent(() => {
+      emit('update:modelValue', editor.getValue())
+    })
+    isLoading.value = false
+    emit('load', editor)
   })
-  isLoading.value = false
-  emit('load', editor)
 })
 
 onUnmounted(() => {

@@ -82,21 +82,23 @@ defineExpose({
 })
 
 onMounted(() => {
-  editor = monaco.editor.createDiffEditor(editorElement.value!, defu(props.options, defaultOptions))
-  editorRef.value = editor
-  originalModel = monaco.editor.createModel(props.original, props.lang)
-  modifiedModel = monaco.editor.createModel(props.modelValue, props.lang)
-  editor.setModel({
-    original: originalModel,
-    modified: modifiedModel
+  nextTick(() => {
+    editor = monaco.editor.createDiffEditor(editorElement.value!, defu(props.options, defaultOptions))
+    editorRef.value = editor
+    originalModel = monaco.editor.createModel(props.original, props.lang)
+    modifiedModel = monaco.editor.createModel(props.modelValue, props.lang)
+    editor.setModel({
+      original: originalModel,
+      modified: modifiedModel
+    })
+  
+    editor.onDidUpdateDiff(() => {
+      emit('update:modelValue', editor.getModel()!.modified.getValue())
+    })
+  
+    isLoading.value = false
+    emit('load', editor)
   })
-
-  editor.onDidUpdateDiff(() => {
-    emit('update:modelValue', editor.getModel()!.modified.getValue())
-  })
-
-  isLoading.value = false
-  emit('load', editor)
 })
 
 onUnmounted(() => {
